@@ -267,12 +267,24 @@ public abstract class PartP2PTunnel<T extends PartP2PTunnel> extends PartBasicSt
         if (is != null && is.getItem() instanceof IMemoryCard mc) {
             if (ForgeEventFactory.onItemUseStart(player, is, 1) <= 0) return false;
 
-            long newFreq = this.getFrequency();
+            final NBTTagCompound data = mc.getData(is);
+            final long freq = data.getLong("freq");
+
             final boolean wasOutput = this.isOutput();
             this.setOutput(false);
 
-            if (wasOutput || this.getFrequency() == 0) {
-                newFreq = System.currentTimeMillis();
+            // Try to figure out the frequency that this block should have
+            long newFreq;
+
+            // If there is a frequency in the card and this is an item
+            if (freq != 0 && this instanceof PartP2PItems) {
+                newFreq = freq;
+            } else {
+                newFreq = this.getFrequency();
+
+                if (wasOutput || this.getFrequency() == 0) {
+                    newFreq = System.currentTimeMillis();
+                }
             }
 
             try {
@@ -282,13 +294,13 @@ public abstract class PartP2PTunnel<T extends PartP2PTunnel> extends PartBasicSt
             }
             this.onTunnelConfigChange();
 
-            final NBTTagCompound data = this.getMemoryCardData();
+            final NBTTagCompound new_data = this.getMemoryCardData();
             final ItemStack p2pItem = this.getItemStack(PartItemStack.Wrench);
             final String type = p2pItem.getUnlocalizedName();
 
-            p2pItem.writeToNBT(data);
+            p2pItem.writeToNBT(new_data);
 
-            mc.setMemoryCardContents(is, type + ".name", data);
+            mc.setMemoryCardContents(is, type + ".name", new_data);
             mc.notifyUser(player, MemoryCardMessages.SETTINGS_SAVED);
             return true;
         }

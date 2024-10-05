@@ -156,6 +156,21 @@ public class P2PCache implements IGridCache {
         this.updateTunnel(t.getFrequency(), !t.isOutput(), true);
     }
 
+    public void clearFreq(final PartP2PTunnel t) {
+        if (this.outputs.containsValue(t)) {
+            this.outputs.remove(t.getFrequency(), t);
+        }
+
+        if (this.inputs.containsValue(t)) {
+            this.inputs.remove(t.getFrequency());
+        }
+
+        t.setFrequency(0);
+
+        this.updateTunnel(t.getFrequency(), t.isOutput(), true);
+        this.updateTunnel(t.getFrequency(), !t.isOutput(), true);
+    }
+
     public TunnelCollection<PartP2PTunnel> getOutputs(final long freq, final Class<? extends PartP2PTunnel> c) {
         final PartP2PTunnel in = this.inputs.get(freq);
         if (in == null) {

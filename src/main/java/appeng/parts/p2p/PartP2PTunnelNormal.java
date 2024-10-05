@@ -141,7 +141,6 @@ public class PartP2PTunnelNormal<T extends PartP2PTunnelNormal> extends PartP2PT
             if (newType != null && !Platform.isSameItem(newType, this.getItemStack())) {
                 if (new Throwable().getStackTrace()[2].getMethodName().equals("place")) return true;
                 final boolean oldOutput = this.isOutput();
-                final long myFreq = this.getFrequency();
 
                 this.getHost().removePart(this.getSide(), false);
                 final ForgeDirection dir = this.getHost().addPart(newType, this.getSide(), player);
@@ -153,7 +152,7 @@ public class PartP2PTunnelNormal<T extends PartP2PTunnelNormal> extends PartP2PT
 
                     try {
                         final P2PCache p2p = newTunnel.getProxy().getP2P();
-                        p2p.updateFreq(newTunnel, myFreq);
+                        p2p.clearFreq(newTunnel);
                     } catch (final GridAccessException e) {
                         // :P
                     }
